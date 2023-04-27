@@ -3,19 +3,20 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import os
-import csv
 import re
 import sys
+sys.path.insert(1, os.getcwd() + "\\venv\\Lib\\site-packages")
 
-import my_variables
+# import my_variables
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 import pandas as pd
+import pwinput
+
+
 
 
 # ============================================================================================ FUNCTIONS ========
@@ -102,6 +103,16 @@ if __name__ == '__main__':
             print("No instance selected....Closing application")
     if instance:
 
+        MY_USERNAME = input("Username: ")
+        match MY_USERNAME:
+            case "1":
+                MY_USERNAME = "axel.antoci@cyberguru.eu"
+            case "5":
+                MY_USERNAME = "vincenzo.matrone@cyberguru.eu"
+            case "9":
+                MY_USERNAME = "marco.calvieri@cyberguru.eu"
+
+        MY_PASSWORD = pwinput.pwinput()
 
         # ================================================================================================= LOGIN ======
         driver = webdriver.Chrome(options=options)
@@ -113,8 +124,11 @@ if __name__ == '__main__':
         email = driver.find_element(By.ID, "username")
         password = driver.find_element(By.ID, "password")
 
-        email.send_keys(my_variables.MY_USERNAME)
-        password.send_keys(my_variables.MY_PASSWORD)
+        # email.send_keys(my_variables.MY_USERNAME)
+        # password.send_keys(my_variables.MY_PASSWORD)
+
+        email.send_keys(MY_USERNAME)
+        password.send_keys(MY_PASSWORD)
 
         driver.find_element(By.ID, "loginbtn").click()
         # ============================================================================================== HOMEPAGE ======
