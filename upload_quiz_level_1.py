@@ -17,6 +17,7 @@ import pandas as pd
 # ============================================================================================ FUNCTIONS ========
 def getModuleStrings(module, Path):
     starting_column = -1
+    # when making an exe remember to add ../ before xlsx file
     df = pd.read_excel(Path + "StringheQuizLite.xlsx", header=None)
     rows = list(df.values.tolist())
     for j, h in enumerate(rows[0]):
