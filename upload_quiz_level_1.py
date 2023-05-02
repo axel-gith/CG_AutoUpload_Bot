@@ -1,12 +1,7 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import os
-import re
 import sys
 sys.path.insert(1, os.getcwd() + "\\venv\\Lib\\site-packages")
-
+import re
 # import my_variables
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -68,15 +63,13 @@ options.add_argument("start-maximized")
 options.add_experimental_option("prefs", {"profile.managed_default_content_setting.images": 2})
 rawPath = os.getcwd()
 Path = rawPath.replace("\\", "/") + "/"
-module_number = ""
 questions_answers_to_upload = []
 
 # Press the green button in the gutter to run the script.
-def uploadQuizMain(instance, MY_USERNAME, MY_PASSWORD):
+def uploadQuizMain(instance, MY_USERNAME, MY_PASSWORD, module_number):
     modified_quiz_count = 0
     # ====================================================================================================== MENU ======
-    print("\nDesired module (es. M09)")
-    module_number = input("\nChoose a module: ").upper()
+    module_number = module_number.upper()
     getModuleStrings(module_number, Path)
     # print (questions_answers_to_upload)
     if len(questions_answers_to_upload) == 0:
