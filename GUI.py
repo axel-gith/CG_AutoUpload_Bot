@@ -1,11 +1,10 @@
 import os
 import sys
-sys.path.insert(1, os.getcwd() + "\\venv\\Lib\\site-packages")
-import upload_quiz_level_1
-import upload_trophies_level_1
-import upload_quiz_level_2_3
 import customtkinter
 from tkinter import messagebox
+import UploadBot
+sys.path.insert(1, os.getcwd() + "\\venv\\Lib\\site-packages")
+
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
@@ -17,6 +16,7 @@ root.geometry("800x650")
 instance = ""
 MY_USERNAME = ""
 can_close = False
+
 def start_bot():
     global instance
     global can_close
@@ -43,13 +43,8 @@ def start_bot():
         error_found = True
     if not error_found:
         can_close = True
-        match optionmenu_1.get():
-            case "Upload quiz (LVL 1)":
-                upload_quiz_level_1.uploadQuizMain(instance, MY_USERNAME, entry2.get(), entry0.get())
-            case "Upload coppe (LVL 1)":
-                upload_trophies_level_1.uploadTrophyMain(instance, MY_USERNAME, entry2.get(), entry0.get())
-            case "Upload quiz (LVL 2-3)":
-                upload_quiz_level_2_3.uploadQuizMain(instance, MY_USERNAME, entry2.get(), entry0.get())
+        bot = UploadBot.UploadBot(optionmenu_1.get(),entry0.get(), instance, MY_USERNAME, entry2.get(), optionmenu_2.get())
+        bot.start_bot()
     if can_close:
         root.destroy()
 
@@ -110,9 +105,13 @@ radiobutton_5.pack(pady=10, padx=10)
 radiobutton_6 = customtkinter.CTkRadioButton(master=frame, text="International", variable=radiobutton_var, value=5)
 radiobutton_6.pack(pady=10, padx=10)
 
-optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz (LVL 1)", "Upload coppe (LVL 1)", "Upload quiz (LVL 2-3)"], width=800)
+optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz", "Upload coppe"], width=800)
 optionmenu_1.pack(pady=10, padx=10, expand=True)
-optionmenu_1.set("Operazione da eseguire")
+optionmenu_1.set("Action")
+
+optionmenu_2 = customtkinter.CTkOptionMenu(frame, values=["1", "2", "3"], width=400)
+optionmenu_2.pack(pady=10, padx=10, expand=True)
+optionmenu_2.set("Level")
 
 entry0=customtkinter.CTkEntry(master=frame, placeholder_text="Modulo (es. M01) o Coppa (es. C02)", width=800)
 entry0.pack(pady=12, padx=10)
