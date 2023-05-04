@@ -15,8 +15,6 @@ from selenium.webdriver.support import expected_conditions as EC
 import selenium.common.exceptions as SEXP
 import pandas as pd
 
-from datetime import date
-
 
 
 # ============================================================================================ FUNCTIONS ========
@@ -54,13 +52,14 @@ def checkIfModified(driver, url, QandA):
     a2 = re.sub('[^A-Za-z0-9\"\'<>=]+', '', QandA[3])
     a3 = re.sub('[^A-Za-z0-9\"\'<>=]+', '', QandA[4])
     if q != question_textarea:
-        print(f"trophy: {QandA[0]}, wrong question")
+        print(f"quiz: {QandA[0]}, wrong question")
     if a1 != answer0_textarea:
-        print(f"trophy: {QandA[0]}, wrong answer 1")
+        print(f"quiz: {QandA[0]}, wrong answer 1")
     if a2 != answer1_textarea:
-        print(f"trophy: {QandA[0]}, wrong answer 2")
+        print(f"quiz: {QandA[0]}, wrong answer 2")
     if a3 != answer2_textarea:
-        print(f"trophy: {QandA[0]}, wrong answer 3")
+        print(f"quiz: {QandA[0]}, wrong answer 3")
+
 # ============================================================================================ GLOBAL VARIABLES ========
 options = Options()
 # options.add_argument('--headless') #Hide GUI
@@ -78,6 +77,12 @@ def uploadQuizMain(instance, MY_USERNAME, MY_PASSWORD, module_number):
         modified_quiz_count = 0
         # ====================================================================================================== MENU ======
         module_number = module_number.upper()
+        lvl = -1
+        if 12 < int(module_number.replace("M", "")) < 25:
+            lvl = 1  # it's and index, so in reality it will access lvl 2 on the webpage
+        else:
+            if 24 < int(module_number.replace("M", "")) < 37:
+                lvl = 2  # it's and index, so in reality it will access lvl 3 on the webpage
         getModuleStrings(module_number, Path)
         # print (questions_answers_to_upload)
         if len(questions_answers_to_upload) == 0:
@@ -105,18 +110,18 @@ def uploadQuizMain(instance, MY_USERNAME, MY_PASSWORD, module_number):
             driver.find_element(By.ID, "loginbtn").click()
             element = WebDriverWait(driver=driver, timeout=20).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "#region-main-box")))
-            print(f"LOGIN as {MY_USERNAME}, instance: {instance}, trophy: {module_number}")
+            print(f"LOGIN as {MY_USERNAME}, instance: {instance}, quiz: {module_number}")
             # ============================================================================================== HOMEPAGE ======
             try:
                 levels_buttons = driver.find_elements(By.XPATH, "//ul[@id='livelli']//li//div[@class='text-center']//a")
-                lvlOne_url = levels_buttons[0].get_attribute("href")
+                lvl_url = levels_buttons[lvl].get_attribute("href")
             except IndexError:
                 print("Wrong username or passoword...closing ")
                 sys.exit()
 
-            lvlOne_url = lvlOne_url.split("#", 1)[0]
+            lvl_url = lvl_url.split("#", 1)[0]
 
-            driver.get(lvlOne_url)
+            driver.get(lvl_url)
             # =========================================================================================== MODULE PAGE ======
             element = WebDriverWait(driver=driver, timeout=20).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "#section-0")))
@@ -143,7 +148,21 @@ def uploadQuizMain(instance, MY_USERNAME, MY_PASSWORD, module_number):
                 # ==================================================================================== EDIT QUIZ PAGE ======
                 element = WebDriverWait(driver=driver, timeout=20).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "#page-1")))
-                question_elements = driver.find_elements(By.XPATH, "//a[contains(@title, '"+str(module_number)+"')]")
+
+                edit_elements = driver.find_elements(By.XPATH, "//a[contains(text(), '(See questions)')]")
+                if not edit_elements:
+                    edit_elements = driver.find_elements(By.XPATH, "//a[contains(text(), '(Visualizza domande)')]")
+
+                driver.get(edit_elements[0].get_attribute("href"))
+                element = WebDriverWait(driver=driver, timeout=20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "#categoryquestions")))
+
+                #//table[@id='categoryquestions']//div[@class='dropdown']//span[contains(text(), 'Modifica domanda')]/..
+                question_elements = driver.find_elements(By.XPATH,
+                                                         "//table[@id='categoryquestions']//div[@class='dropdown']//span[contains(text(), 'Edit question')]/..")
+                if not question_elements:
+                    question_elements = driver.find_elements(By.XPATH,
+                                                             "//table[@id='categoryquestions']//div[@class='dropdown']//span[contains(text(), 'Modifica domanda')]/..")
                 question_urls = []
                 for el in question_elements:
                     question_urls.append(el.get_attribute("href"))
@@ -180,7 +199,7 @@ def uploadQuizMain(instance, MY_USERNAME, MY_PASSWORD, module_number):
 
                             driver.find_element(By.ID, "id_submitbutton").click()
                             element = WebDriverWait(driver=driver, timeout=20).until(
-                                EC.presence_of_element_located((By.CSS_SELECTOR, "#page-1")))
+                                EC.presence_of_element_located((By.CSS_SELECTOR, "#maincontent")))
                             print(f"modified quiz: {test[0]}")
                             if modified_quiz_count == len(questions_answers_to_upload):
                                 print("Modified all quizzes present in file, closing...")

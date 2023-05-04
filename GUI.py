@@ -3,6 +3,7 @@ import sys
 sys.path.insert(1, os.getcwd() + "\\venv\\Lib\\site-packages")
 import upload_quiz_level_1
 import upload_trophies_level_1
+import upload_quiz_level_2_3
 import customtkinter
 from tkinter import messagebox
 
@@ -47,6 +48,8 @@ def start_bot():
                 upload_quiz_level_1.uploadQuizMain(instance, MY_USERNAME, entry2.get(), entry0.get())
             case "Upload coppe (LVL 1)":
                 upload_trophies_level_1.uploadTrophyMain(instance, MY_USERNAME, entry2.get(), entry0.get())
+            case "Upload quiz (LVL 2-3)":
+                upload_quiz_level_2_3.uploadQuizMain(instance, MY_USERNAME, entry2.get(), entry0.get())
     if can_close:
         root.destroy()
 
@@ -107,7 +110,7 @@ radiobutton_5.pack(pady=10, padx=10)
 radiobutton_6 = customtkinter.CTkRadioButton(master=frame, text="International", variable=radiobutton_var, value=5)
 radiobutton_6.pack(pady=10, padx=10)
 
-optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz (LVL 1)", "Upload coppe (LVL 1)"], width=800)
+optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz (LVL 1)", "Upload coppe (LVL 1)", "Upload quiz (LVL 2-3)"], width=800)
 optionmenu_1.pack(pady=10, padx=10, expand=True)
 optionmenu_1.set("Operazione da eseguire")
 
