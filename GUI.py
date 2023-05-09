@@ -11,11 +11,16 @@ customtkinter.set_default_color_theme("dark-blue")
 
 root = customtkinter.CTk()
 root.title("CyberGuru_UploadBOT by A.A. (v1.0)")
-root.geometry("800x650")
+root.geometry("900x750")
 
 instance = ""
 MY_USERNAME = ""
 can_close = False
+
+
+def stop_bot():
+    root.destroy()
+
 
 def start_bot():
     global instance
@@ -43,7 +48,7 @@ def start_bot():
         error_found = True
     if not error_found:
         can_close = True
-        bot = UploadBot.UploadBot(optionmenu_1.get(),entry0.get(), instance, MY_USERNAME, entry2.get(), optionmenu_2.get())
+        bot = UploadBot.UploadBot(optionmenu_1.get(), entry0.get(), instance, MY_USERNAME, entry2.get(), optionmenu_2.get())
         bot.start_bot()
     if can_close:
         root.destroy()
@@ -105,7 +110,7 @@ radiobutton_5.pack(pady=10, padx=10)
 radiobutton_6 = customtkinter.CTkRadioButton(master=frame, text="International", variable=radiobutton_var, value=5)
 radiobutton_6.pack(pady=10, padx=10)
 
-optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz", "Upload coppe"], width=800)
+optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz", "Upload coppe", "Upload video"], width=800)
 optionmenu_1.pack(pady=10, padx=10, expand=True)
 optionmenu_1.set("Action")
 
@@ -122,7 +127,8 @@ entry2=customtkinter.CTkEntry(master=frame, placeholder_text="Password", show="*
 entry2.pack(pady=12, padx=10)
 
 button = customtkinter.CTkButton(master=frame, text="Start bot", command=start_bot)
-button.pack(pady=12,padx=10)
+button.pack(pady=6,padx=10)
 
-# checkbox = customtkinter.CTkCheckBox(master=frame, text="Remeber me")
-# checkbox.pack(pady=12, padx=10)
+button_stop = customtkinter.CTkButton(master=frame, text="Exit", command=stop_bot)
+button_stop.pack(pady=12,padx=10)
+
