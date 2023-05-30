@@ -379,6 +379,7 @@ class UploadBot:
                 print(f"element: {QandA[0]}, wrong string")
         if missmatch:
             self.logger.warning(f"element: {QandA[0]}, wrong string")
+        return missmatch
 
     def get_trophy_url_overview_page(self):
         try:
