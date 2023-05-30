@@ -47,7 +47,7 @@ def start_bot():
         messagebox.showerror("No password", "Please input Password")
         error_found = True
     if not error_found:
-        can_close = True
+        #can_close = True
         bot = UploadBot.UploadBot(optionmenu_1.get(), entry0.get(), instance, MY_USERNAME, entry2.get(), optionmenu_2.get())
         bot.start_bot()
     if can_close:
@@ -68,6 +68,14 @@ def set_instance(choice):
             instance = "awareness.cyberguru.it"
         case 5:
             instance = "international.cyberguru.it"
+        case 6:
+            instance = "acsdatasystems.cyberguru.it"
+        case 7:
+            instance = "axsym.cyberguru.it"
+        case 8:
+            instance = "pentaqo.cyberguru.it"
+        case 9:
+            instance = "cyberawareness.aeronautica.difesa.it"
         case _:
             print("No instance selected....Closing application")
 
@@ -83,32 +91,50 @@ def set_username(username):
         case _:
             MY_USERNAME = username
 
-
+frame_top1 = customtkinter.CTkFrame(master=root)
+frame_top1.pack(pady=20, padx=40, fill="both", expand=True, side="top")
+frame_top2 = customtkinter.CTkFrame(master=root)
+frame_top2.pack(pady=20, padx=40, fill="both", expand=True, side="top")
 frame = customtkinter.CTkFrame(master=root)
-frame.pack(pady=20, padx=40, fill="both", expand=True)
+frame.pack(pady=20, padx=40, fill="both", expand=True, side="bottom")
+
+label_top = customtkinter.CTkLabel(master=frame_top1, text="Instance")
+label_top.pack(pady=12, padx=10)
 
 label = customtkinter.CTkLabel(master=frame, text="Upload System")
 label.pack(pady=12, padx=10)
 
 radiobutton_var = customtkinter.IntVar(value=-1)
 
-radiobutton_1 = customtkinter.CTkRadioButton(master=frame, text="Dev", variable=radiobutton_var, value=0)
-radiobutton_1.pack(pady=10, padx=10)
+radiobutton_1 = customtkinter.CTkRadioButton(master=frame_top1, text="Dev", variable=radiobutton_var, value=0)
+radiobutton_1.pack(pady=10, padx=10, in_=frame_top1, side="left")
 
-radiobutton_2 = customtkinter.CTkRadioButton(master=frame,  text="Enterprise", variable=radiobutton_var, value=1)
-radiobutton_2.pack(pady=10, padx=10)
+radiobutton_2 = customtkinter.CTkRadioButton(master=frame_top1,  text="Enterprise", variable=radiobutton_var, value=1)
+radiobutton_2.pack(pady=10, padx=10, in_=frame_top1, side="left")
 
-radiobutton_3 = customtkinter.CTkRadioButton(master=frame, text="Enterprise-ww", variable=radiobutton_var, value=2)
-radiobutton_3.pack(pady=10, padx=10)
+radiobutton_3 = customtkinter.CTkRadioButton(master=frame_top1, text="Enterprise-ww", variable=radiobutton_var, value=2)
+radiobutton_3.pack(pady=10, padx=10, in_=frame_top1, side="left")
 
-radiobutton_4 = customtkinter.CTkRadioButton(master=frame, text="Pirelli", variable=radiobutton_var, value=3)
-radiobutton_4.pack(pady=10, padx=10)
+radiobutton_4 = customtkinter.CTkRadioButton(master=frame_top1, text="Pirelli", variable=radiobutton_var, value=3)
+radiobutton_4.pack(pady=10, padx=10, in_=frame_top1, side="left")
 
-radiobutton_5 = customtkinter.CTkRadioButton(master=frame, text="Awareness", variable=radiobutton_var, value=4)
-radiobutton_5.pack(pady=10, padx=10)
+radiobutton_5 = customtkinter.CTkRadioButton(master=frame_top1, text="Awareness", variable=radiobutton_var, value=4)
+radiobutton_5.pack(pady=10, padx=10, in_=frame_top1, side="left")
 
-radiobutton_6 = customtkinter.CTkRadioButton(master=frame, text="International", variable=radiobutton_var, value=5)
-radiobutton_6.pack(pady=10, padx=10)
+radiobutton_6 = customtkinter.CTkRadioButton(master=frame_top1, text="International", variable=radiobutton_var, value=5)
+radiobutton_6.pack(pady=10, padx=10, in_=frame_top1, side="left")
+
+radiobutton_7 = customtkinter.CTkRadioButton(master=frame_top2, text="acsdatasystems", variable=radiobutton_var, value=6)
+radiobutton_7.pack(pady=10, padx=10, in_=frame_top2, side="left")
+
+radiobutton_8 = customtkinter.CTkRadioButton(master=frame_top2, text="axsym", variable=radiobutton_var, value=7)
+radiobutton_8.pack(pady=10, padx=10, in_=frame_top2, side="left")
+
+radiobutton_9 = customtkinter.CTkRadioButton(master=frame_top2, text="pentaqo", variable=radiobutton_var, value=8)
+radiobutton_9.pack(pady=10, padx=10, in_=frame_top2, side="left")
+
+radiobutton_10 = customtkinter.CTkRadioButton(master=frame_top2, text="Resia", variable=radiobutton_var, value=9)
+radiobutton_10.pack(pady=10, padx=10, in_=frame_top2, side="left")
 
 optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz", "Upload coppe", "Upload video"], width=800)
 optionmenu_1.pack(pady=10, padx=10, expand=True)
@@ -127,8 +153,8 @@ entry2=customtkinter.CTkEntry(master=frame, placeholder_text="Password", show="*
 entry2.pack(pady=12, padx=10)
 
 button = customtkinter.CTkButton(master=frame, text="Start bot", command=start_bot)
-button.pack(pady=6,padx=10)
+button.pack(pady=6, padx=10)
 
 button_stop = customtkinter.CTkButton(master=frame, text="Exit", command=stop_bot)
-button_stop.pack(pady=12,padx=10)
+button_stop.pack(pady=12, padx=10)
 
