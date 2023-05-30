@@ -47,7 +47,7 @@ class UploadBot:
         self.trophy_string = {}
         self.isTrophy = False
         self.isInternational = False
-        self.retry_attempts = 0
+
     def start_bot(self):
         if self.idElement.startswith("C"):
             self.isTrophy = True
@@ -132,7 +132,6 @@ class UploadBot:
             for video in module_lessons:
                 self.edit_video(video)
 
-
     def get_video_url(self, language):
         if language == "ITA":
             try:
@@ -204,7 +203,7 @@ class UploadBot:
                 self.check_if_element_modified(edit_v_url, test)
                 break
 
-    def custom_time_waster(self, time_value=4):
+    def custom_time_waster(self, time_value=5):
         try:
             element = self.wait_for_element_xpath(time_value, "//button[contains(@id, 'non_existant_id')]")
         except sexp.TimeoutException:
@@ -263,66 +262,73 @@ class UploadBot:
                 ec.presence_of_element_located((By.CSS_SELECTOR, "#id_generalheader")))
             for test in self.questions_answers_to_upload:
                 if test[0] == self.driver.find_element(By.ID, "id_name").get_attribute('value'):
-
                     self.custom_time_waster()
-                    element = WebDriverWait(driver=self.driver, timeout=20).until(
-                        ec.visibility_of_element_located((By.XPATH, "//button[contains(@id, 'yui_')]")))
-                    self.make_textarea_visable()
-                    question_textarea = self.driver.find_element(By.ID, "id_questiontexteditable")
-                    question_real_textarea = self.driver.find_element(By.ID, "id_questiontext")
-                    question_real_textarea.send_keys(test[1])
-
-                    answer0_textarea = self.driver.find_element(By.ID, "id_answer_0editable")
-                    question_real_answer0_textarea = self.driver.find_element(By.ID, "id_answer_0")
-                    question_real_answer0_textarea.send_keys(test[2])
-
-                    answer1_textarea = self.driver.find_element(By.ID, "id_answer_1editable")
-                    question_real_answer1_textarea = self.driver.find_element(By.ID, "id_answer_1")
-                    question_real_answer1_textarea.send_keys(test[3])
-
-                    answer2_textarea = self.driver.find_element(By.ID, "id_answer_2editable")
-                    question_real_answer2_textarea = self.driver.find_element(By.ID, "id_answer_2")
-                    question_real_answer2_textarea.send_keys(test[4])
-
-                    self.driver.execute_script("arguments[0].focus()", question_textarea)
-                    self.custom_time_waster(0.1)
-                    self.driver.execute_script("arguments[0].innerHTML = arguments[1];", question_textarea, test[1])
-                    self.driver.execute_script("arguments[0].focus()", question_textarea)
-                    self.custom_time_waster(0.1)
-                    self.driver.execute_script("arguments[0].focus()", answer0_textarea)
-                    self.custom_time_waster(0.1)
-                    self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer0_textarea, test[2])
-                    self.driver.execute_script("arguments[0].focus()", answer0_textarea)
-                    self.custom_time_waster(0.1)
-                    self.driver.execute_script("arguments[0].focus()", answer1_textarea)
-                    self.custom_time_waster(0.1)
-                    self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer1_textarea, test[3])
-                    self.driver.execute_script("arguments[0].focus()", answer1_textarea)
-                    self.custom_time_waster(0.1)
-                    self.driver.execute_script("arguments[0].focus()", answer2_textarea)
-                    self.custom_time_waster(0.1)
-                    self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer2_textarea, test[4])
-                    self.driver.execute_script("arguments[0].focus()", answer2_textarea)
-                    self.custom_time_waster(0.1)
-
-                    self.modified_quiz_count += 1
-
-                    self.driver.find_element(By.ID, "id_submitbutton").click()
-                    if self.level == "1":
+                    retry_attempts = 0
+                    while retry_attempts < 3:
+                        retry_attempts += 1
                         element = WebDriverWait(driver=self.driver, timeout=20).until(
-                            ec.presence_of_element_located((By.CSS_SELECTOR, "#page-1")))
-                    else:
-                        element = WebDriverWait(driver=self.driver, timeout=20).until(
-                            ec.presence_of_element_located((By.CSS_SELECTOR, "#maincontent")))
-                    self.logger.info(f"saved modified quiz: {test[0]}")
-                    if self.modified_quiz_count == len(self.questions_answers_to_upload):
-                        print("Modified all quizzes present in file, closing...")
-                        self.driver.quit()
-                       # sys.exit()
-                    # driver.find_element(By.ID, "id_cancel").click()
-                    # ============================================= CHECK IF UPLOAD IS CORRECT ====================
-                    self.check_if_element_modified(el_url, test)
+                            ec.visibility_of_element_located((By.XPATH, "//button[contains(@id, 'yui_')]")))
+                        self.make_textarea_visable()
+                        question_textarea = self.driver.find_element(By.ID, "id_questiontexteditable")
+                        question_real_textarea = self.driver.find_element(By.ID, "id_questiontext")
+                        question_real_textarea.send_keys(test[1])
 
+                        answer0_textarea = self.driver.find_element(By.ID, "id_answer_0editable")
+                        question_real_answer0_textarea = self.driver.find_element(By.ID, "id_answer_0")
+                        question_real_answer0_textarea.send_keys(test[2])
+
+                        answer1_textarea = self.driver.find_element(By.ID, "id_answer_1editable")
+                        question_real_answer1_textarea = self.driver.find_element(By.ID, "id_answer_1")
+                        question_real_answer1_textarea.send_keys(test[3])
+
+                        answer2_textarea = self.driver.find_element(By.ID, "id_answer_2editable")
+                        question_real_answer2_textarea = self.driver.find_element(By.ID, "id_answer_2")
+                        question_real_answer2_textarea.send_keys(test[4])
+
+                        self.driver.execute_script("arguments[0].focus()", question_textarea)
+                        self.custom_time_waster(0.1)
+                        self.driver.execute_script("arguments[0].innerHTML = arguments[1];", question_textarea, test[1])
+                        self.driver.execute_script("arguments[0].focus()", question_textarea)
+                        self.custom_time_waster(0.1)
+                        self.driver.execute_script("arguments[0].focus()", answer0_textarea)
+                        self.custom_time_waster(0.1)
+                        self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer0_textarea, test[2])
+                        self.driver.execute_script("arguments[0].focus()", answer0_textarea)
+                        self.custom_time_waster(0.1)
+                        self.driver.execute_script("arguments[0].focus()", answer1_textarea)
+                        self.custom_time_waster(0.1)
+                        self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer1_textarea, test[3])
+                        self.driver.execute_script("arguments[0].focus()", answer1_textarea)
+                        self.custom_time_waster(0.1)
+                        self.driver.execute_script("arguments[0].focus()", answer2_textarea)
+                        self.custom_time_waster(0.1)
+                        self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer2_textarea, test[4])
+                        self.driver.execute_script("arguments[0].focus()", answer2_textarea)
+                        self.custom_time_waster(0.1)
+
+                        self.modified_quiz_count += 1
+
+                        self.driver.find_element(By.ID, "id_submitbutton").click()
+                        if self.level == "1":
+                            element = WebDriverWait(driver=self.driver, timeout=20).until(
+                                ec.presence_of_element_located((By.CSS_SELECTOR, "#page-1")))
+                        else:
+                            element = WebDriverWait(driver=self.driver, timeout=20).until(
+                                ec.presence_of_element_located((By.CSS_SELECTOR, "#maincontent")))
+                        self.logger.info(f"saved modified quiz: {test[0]}")
+                        if self.modified_quiz_count == len(self.questions_answers_to_upload):
+                            print("Modified all quizzes present in file, closing...")
+                            self.driver.quit()
+                        # sys.exit()
+                        # driver.find_element(By.ID, "id_cancel").click()
+                        # ============================================= CHECK IF UPLOAD IS CORRECT ====================
+                        if not self.check_if_element_modified(el_url, test): # returns false if no missmatch was found, so string are correct
+                            self.logger.info(f"{test[0]} was modified with success")
+                            break
+                        else:
+                            self.logger.info(f"{test[0]} retry attempts {retry_attempts}/3")
+                            if retry_attempts == 3:
+                                self.logger.warning(f"ALL ATTEMPTS FAILED FOR {test[0]}")
                     break
 
     def check_if_element_modified(self, url, QandA):
