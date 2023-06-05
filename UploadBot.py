@@ -86,9 +86,9 @@ class UploadBot:
                                                        "//ul[@id='livelli']//li//div[@class='text-center']//a")
             lvl_url = levels_buttons[int(self.level) - 1].get_attribute("href")
         except IndexError:
-            self.logger.error("Wrong username or passoword")
-            print("Wrong username or passoword...closing ")
-            sys.exit()
+            self.logger.warning("Wrong username or passoword...closing browser")
+            print("Wrong username or passoword...closing browser")
+            self.driver.quit()
         lvl_url = lvl_url.split("#", 1)[0]
         self.driver.get(lvl_url)
         # =========================================================================================== MODULE PAGE ======
@@ -141,12 +141,12 @@ class UploadBot:
                     "href")
             except sexp.TimeoutException:
                 try:
-                    edit_v_url = WebDriverWait(driver=self.driver, timeout=3).until(
+                    edit_v_url = WebDriverWait(driver=self.driver, timeout=1).until(
                         ec.presence_of_element_located(
                             (By.XPATH, "//a[contains(@title, 'Aggiorna pagina: video')]"))).get_attribute(
                         "href")
                 except sexp.TimeoutException:
-                    edit_v_url = WebDriverWait(driver=self.driver, timeout=3).until(
+                    edit_v_url = WebDriverWait(driver=self.driver, timeout=1).until(
                         ec.presence_of_element_located(
                             (By.XPATH, "//a[contains(@title, 'Aggiorna pagina: Video')]"))).get_attribute(
                         "href")
@@ -158,12 +158,12 @@ class UploadBot:
                     "href")
             except sexp.TimeoutException:
                 try:
-                    edit_v_url = WebDriverWait(driver=self.driver, timeout=3).until(
+                    edit_v_url = WebDriverWait(driver=self.driver, timeout=1).until(
                         ec.presence_of_element_located(
                             (By.XPATH, "//a[contains(@title, 'Update page: Video')]"))).get_attribute(
                         "href")
                 except sexp.TimeoutException:
-                    edit_v_url = WebDriverWait(driver=self.driver, timeout=3).until(
+                    edit_v_url = WebDriverWait(driver=self.driver, timeout=1).until(
                         ec.presence_of_element_located(
                             (By.XPATH, "//a[contains(@title, 'Aggiorna pagina: video')]"))).get_attribute(
                         "href")
@@ -202,20 +202,6 @@ class UploadBot:
                     edit_v_url = self.get_video_url("ENG")
                 self.check_if_element_modified(edit_v_url, test)
                 break
-
-    def custom_time_waster(self, time_value=5):
-        try:
-            element = self.wait_for_element_xpath(time_value, "//button[contains(@id, 'non_existant_id')]")
-        except sexp.TimeoutException:
-            return 0
-
-    def wait_for_element_xpath(self, timeout_value, xpath):
-        return WebDriverWait(driver=self.driver, timeout=timeout_value).until(
-            ec.presence_of_element_located((By.XPATH, xpath)))
-
-    def wait_for_element_css(self, timeout_value, css_selector):
-        return WebDriverWait(driver=self.driver, timeout=timeout_value).until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
 
     def get_quiz_to_edit_level_2_3(self):
         edit_elements = self.driver.find_elements(By.XPATH, "//a[contains(text(), '(See questions)')]")
@@ -286,22 +272,18 @@ class UploadBot:
                         question_real_answer2_textarea.send_keys(test[4])
 
                         self.driver.execute_script("arguments[0].focus()", question_textarea)
-                        self.custom_time_waster(0.1)
                         self.driver.execute_script("arguments[0].innerHTML = arguments[1];", question_textarea, test[1])
                         self.driver.execute_script("arguments[0].focus()", question_textarea)
                         self.custom_time_waster(0.1)
                         self.driver.execute_script("arguments[0].focus()", answer0_textarea)
-                        self.custom_time_waster(0.1)
                         self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer0_textarea, test[2])
                         self.driver.execute_script("arguments[0].focus()", answer0_textarea)
                         self.custom_time_waster(0.1)
                         self.driver.execute_script("arguments[0].focus()", answer1_textarea)
-                        self.custom_time_waster(0.1)
                         self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer1_textarea, test[3])
                         self.driver.execute_script("arguments[0].focus()", answer1_textarea)
                         self.custom_time_waster(0.1)
                         self.driver.execute_script("arguments[0].focus()", answer2_textarea)
-                        self.custom_time_waster(0.1)
                         self.driver.execute_script('arguments[0].innerHTML = arguments[1];', answer2_textarea, test[4])
                         self.driver.execute_script("arguments[0].focus()", answer2_textarea)
                         self.custom_time_waster(0.1)
@@ -315,20 +297,24 @@ class UploadBot:
                         else:
                             element = WebDriverWait(driver=self.driver, timeout=20).until(
                                 ec.presence_of_element_located((By.CSS_SELECTOR, "#maincontent")))
-                        self.logger.info(f"saved modified quiz: {test[0]}")
+                        self.logger.debug(f"saved modified quiz: {test[0]}")
                         if self.modified_quiz_count == len(self.questions_answers_to_upload):
                             print("Modified all quizzes present in file, closing...")
                             self.driver.quit()
+                            break
                         # sys.exit()
                         # driver.find_element(By.ID, "id_cancel").click()
                         # ============================================= CHECK IF UPLOAD IS CORRECT ====================
                         if not self.check_if_element_modified(el_url, test): # returns false if no missmatch was found, so string are correct
                             self.logger.info(f"{test[0]} was modified with success")
+                            print(f"{test[0]} was modified with success")
                             break
                         else:
                             self.logger.info(f"{test[0]} retry attempts {retry_attempts}/3")
+                            print(f"{test[0]} retry attempts {retry_attempts}/3")
                             if retry_attempts == 3:
-                                self.logger.warning(f"ALL ATTEMPTS FAILED FOR {test[0]}")
+                                self.logger.warning(f"ALL ATTEMPTS FAILED FOR {test[0]} - skipping")
+                                print(f"ALL ATTEMPTS FAILED FOR {test[0]} - skipping")
                     break
 
     def check_if_element_modified(self, url, QandA):
@@ -486,3 +472,18 @@ class UploadBot:
             print("No video found...closing...")
             sys.exit()
         return
+
+    # WAITERS
+    def custom_time_waster(self, time_value=my_variables.edit_page_wait):
+        try:
+            element = self.wait_for_element_xpath(time_value, "//button[contains(@id, 'non_existant_id')]")
+        except sexp.TimeoutException:
+            return 0
+
+    def wait_for_element_xpath(self, timeout_value, xpath):
+        return WebDriverWait(driver=self.driver, timeout=timeout_value).until(
+            ec.presence_of_element_located((By.XPATH, xpath)))
+
+    def wait_for_element_css(self, timeout_value, css_selector):
+        return WebDriverWait(driver=self.driver, timeout=timeout_value).until(
+            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
