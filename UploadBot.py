@@ -165,7 +165,7 @@ class UploadBot:
                 except sexp.TimeoutException:
                     edit_v_url = WebDriverWait(driver=self.driver, timeout=1).until(
                         ec.presence_of_element_located(
-                            (By.XPATH, "//a[contains(@title, 'Aggiorna pagina: video')]"))).get_attribute(
+                            (By.XPATH, "//a[contains(@title, 'Update page: video')]"))).get_attribute(
                         "href")
         return edit_v_url
 
@@ -247,7 +247,11 @@ class UploadBot:
             element = WebDriverWait(driver=self.driver, timeout=20).until(
                 ec.presence_of_element_located((By.CSS_SELECTOR, "#id_generalheader")))
             for test in self.questions_answers_to_upload:
-                if test[0] == self.driver.find_element(By.ID, "id_name").get_attribute('value'):
+                quiz_id = self.driver.find_element(By.ID, "id_name").get_attribute('value')
+                if test[0] == quiz_id or (test[0][:4]+test[0][5:]) == quiz_id:
+                    if (test[0][:4]+test[0][5:]) == quiz_id:
+                        self.driver.find_element(By.ID, "id_name").clear()
+                        self.driver.find_element(By.ID, "id_name").send_keys(test[0])
                     self.custom_time_waster()
                     retry_attempts = 0
                     while retry_attempts < 3:
@@ -365,6 +369,9 @@ class UploadBot:
                 print(f"element: {QandA[0]}, wrong string")
         if missmatch:
             self.logger.warning(f"element: {QandA[0]}, wrong string")
+        else:
+            print(f"Element {QandA[0]} modified with success")
+            self.logger.warning(f"Element {QandA[0]} modified with success")
         return missmatch
 
     def get_trophy_url_overview_page(self):
