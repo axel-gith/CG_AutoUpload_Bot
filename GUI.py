@@ -3,6 +3,7 @@ import sys
 import customtkinter
 from tkinter import messagebox
 import UploadBot
+from tkinter import *
 sys.path.insert(1, os.getcwd() + "\\venv\\Lib\\site-packages")
 
 
@@ -26,12 +27,9 @@ def start_bot():
     global instance
     global can_close
     error_found = False
-    if radiobutton_var.get() == -1:
+    if not list.curselection() and not entry_instace.get():
         messagebox.showerror("No instance", "Please select an instance")
         error_found = True
-    else:
-        set_instance(radiobutton_var.get())
-
     if optionmenu_1.get() == "Operazione da eseguire" and error_found == False:
         messagebox.showerror("No action", "Please select an action to perform")
         error_found = True
@@ -48,10 +46,14 @@ def start_bot():
         error_found = True
     if not error_found:
         #can_close = True
-        bot = UploadBot.UploadBot(optionmenu_1.get(), entry0.get(), instance, MY_USERNAME, entry2.get(), optionmenu_2.get())
-        bot.start_bot()
-    if can_close:
-        root.destroy()
+        for element in list.curselection():
+            set_instance(element)
+            bot = UploadBot.UploadBot(optionmenu_1.get(), entry0.get(), instance, MY_USERNAME, entry2.get(), optionmenu_2.get())
+            bot.start_bot()
+        if entry_instace.get():
+            istanza = entry_instace.get().replace("https://", "").replace("www", "")
+            bot = UploadBot.UploadBot(optionmenu_1.get(), entry0.get(), istanza, MY_USERNAME, entry2.get(), optionmenu_2.get())
+            bot.start_bot()
 
 def set_instance(choice):
     global instance
@@ -78,6 +80,7 @@ def set_instance(choice):
             instance = "cyberawareness.aeronautica.difesa.it"
         case _:
             print("No instance selected....Closing application")
+            start_bot()
 
 def set_username(username):
     global MY_USERNAME
@@ -93,8 +96,8 @@ def set_username(username):
 
 frame_top1 = customtkinter.CTkFrame(master=root)
 frame_top1.pack(pady=20, padx=40, fill="both", expand=True, side="top")
-frame_top2 = customtkinter.CTkFrame(master=root)
-frame_top2.pack(pady=20, padx=40, fill="both", expand=True, side="top")
+# frame_top2 = customtkinter.CTkFrame(master=root)
+# frame_top2.pack(pady=20, padx=40, fill="both", expand=True, side="top")
 frame = customtkinter.CTkFrame(master=root)
 frame.pack(pady=20, padx=40, fill="both", expand=True, side="bottom")
 
@@ -103,38 +106,33 @@ label_top.pack(pady=12, padx=10)
 
 label = customtkinter.CTkLabel(master=frame, text="Upload System")
 label.pack(pady=12, padx=10)
+# ==========================================================
 
-radiobutton_var = customtkinter.IntVar(value=-1)
 
-radiobutton_1 = customtkinter.CTkRadioButton(master=frame_top1, text="Dev", variable=radiobutton_var, value=0)
-radiobutton_1.pack(pady=10, padx=10, in_=frame_top1, side="left")
 
-radiobutton_2 = customtkinter.CTkRadioButton(master=frame_top1,  text="Enterprise", variable=radiobutton_var, value=1)
-radiobutton_2.pack(pady=10, padx=10, in_=frame_top1, side="left")
+# Choosing selectmode as multiple
+# for selecting multiple options
+list = Listbox(master=frame_top1, selectmode="multiple", width=50, fg="cornsilk")
 
-radiobutton_3 = customtkinter.CTkRadioButton(master=frame_top1, text="Enterprise-ww", variable=radiobutton_var, value=2)
-radiobutton_3.pack(pady=10, padx=10, in_=frame_top1, side="left")
+# Widget expands horizontally and
+# vertically by assigning both to
+# fill option
+list.pack(expand=YES)
 
-radiobutton_4 = customtkinter.CTkRadioButton(master=frame_top1, text="Pirelli", variable=radiobutton_var, value=3)
-radiobutton_4.pack(pady=10, padx=10, in_=frame_top1, side="left")
+# Taking a list 'x' with the items
+x = ["Dev", "Enterprise", "Enterprise-ww", "Pirelli", "Awareness",
+     "International", "Acsdatasystems", "Axsym", "Pentaqo", "Resia"]
 
-radiobutton_5 = customtkinter.CTkRadioButton(master=frame_top1, text="Awareness", variable=radiobutton_var, value=4)
-radiobutton_5.pack(pady=10, padx=10, in_=frame_top1, side="left")
+for each_item in range(len(x)):
+    list.insert(END, x[each_item])
 
-radiobutton_6 = customtkinter.CTkRadioButton(master=frame_top1, text="International", variable=radiobutton_var, value=5)
-radiobutton_6.pack(pady=10, padx=10, in_=frame_top1, side="left")
+    # coloring alternative lines of listbox
+    list.itemconfig(each_item,
+                    bg="grey25" if each_item % 2 == 0 else "grey30")
 
-radiobutton_7 = customtkinter.CTkRadioButton(master=frame_top2, text="acsdatasystems", variable=radiobutton_var, value=6)
-radiobutton_7.pack(pady=10, padx=10, in_=frame_top2, side="left")
-
-radiobutton_8 = customtkinter.CTkRadioButton(master=frame_top2, text="axsym", variable=radiobutton_var, value=7)
-radiobutton_8.pack(pady=10, padx=10, in_=frame_top2, side="left")
-
-radiobutton_9 = customtkinter.CTkRadioButton(master=frame_top2, text="pentaqo", variable=radiobutton_var, value=8)
-radiobutton_9.pack(pady=10, padx=10, in_=frame_top2, side="left")
-
-radiobutton_10 = customtkinter.CTkRadioButton(master=frame_top2, text="Resia", variable=radiobutton_var, value=9)
-radiobutton_10.pack(pady=10, padx=10, in_=frame_top2, side="left")
+entry_instace=customtkinter.CTkEntry(master=frame_top1, placeholder_text="Istanza non presente in lista (Es. enterprise.cyberguru.it)", width=800)
+entry_instace.pack(pady=12, padx=10)
+# ==========================================================
 
 optionmenu_1 = customtkinter.CTkOptionMenu(frame, values=["Upload quiz", "Upload coppe", "Upload video"], width=800)
 optionmenu_1.pack(pady=10, padx=10, expand=True)
