@@ -78,7 +78,9 @@ class UploadBot:
         print(f"LOGIN as {self.username}, instance: {self.instance}, element: {self.idElement}, action: {self.action}")
         self.logger.info(
             f"LOGIN as {self.username}, instance: {self.instance}, element: {self.idElement}, action: {self.action}")
-        self.goto_level_page()
+        #self.goto_level_page()
+        self.driver.get("https://enterprise.cyberguru.it/mod/quiz/edit.php?cmid=32&cat=30%2C88&category=30%2C88&lastchanged=41")
+        self.get_quiz_to_edit_level_1()
 
     def goto_level_page(self):
         try:
@@ -200,7 +202,9 @@ class UploadBot:
                     edit_v_url = self.get_video_url("ITA")
                 else:
                     edit_v_url = self.get_video_url("ENG")
-                self.check_if_element_modified(edit_v_url, test)
+                if not self.check_if_element_modified(edit_v_url, test):
+                    self.logger.info("Video modiefied with success")
+                    print("Video modiefied with success")
                 break
 
     def get_quiz_to_edit_level_2_3(self):
@@ -302,10 +306,6 @@ class UploadBot:
                             element = WebDriverWait(driver=self.driver, timeout=20).until(
                                 ec.presence_of_element_located((By.CSS_SELECTOR, "#maincontent")))
                         self.logger.debug(f"saved modified quiz: {test[0]}")
-                        if self.modified_quiz_count == len(self.questions_answers_to_upload):
-                            print("Modified all quizzes present in file, closing...")
-                            self.driver.quit()
-                            break
                         # sys.exit()
                         # driver.find_element(By.ID, "id_cancel").click()
                         # ============================================= CHECK IF UPLOAD IS CORRECT ====================
@@ -319,6 +319,10 @@ class UploadBot:
                             if retry_attempts == 3:
                                 self.logger.warning(f"ALL ATTEMPTS FAILED FOR {test[0]} - skipping")
                                 print(f"ALL ATTEMPTS FAILED FOR {test[0]} - skipping")
+                        if self.modified_quiz_count == len(self.questions_answers_to_upload):
+                            print("Modified all quizzes present in file, closing...")
+                            self.driver.quit()
+                            break
                     break
 
     def check_if_element_modified(self, url, QandA):
@@ -369,9 +373,6 @@ class UploadBot:
                 print(f"element: {QandA[0]}, wrong string")
         if missmatch:
             self.logger.warning(f"element: {QandA[0]}, wrong string")
-        else:
-            print(f"Element {QandA[0]} modified with success")
-            self.logger.warning(f"Element {QandA[0]} modified with success")
         return missmatch
 
     def get_trophy_url_overview_page(self):
