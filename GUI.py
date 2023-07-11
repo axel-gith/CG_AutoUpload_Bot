@@ -142,7 +142,8 @@ optionmenu_2 = customtkinter.CTkOptionMenu(frame, values=["1", "2", "3"], width=
 optionmenu_2.pack(pady=10, padx=10, expand=True)
 optionmenu_2.set("Level")
 
-entry0=customtkinter.CTkEntry(master=frame, placeholder_text="Modulo (es. M01) o Coppa (es. C02)", width=800)
+entry0=customtkinter.CTkEntry(master=frame, placeholder_text="Modulo (es. M01) o Coppa (es. C02) - "
+                                                             "Selezione multima separando ID con virgola (es.M01,M02)", width=800)
 entry0.pack(pady=12, padx=10)
 
 entry1=customtkinter.CTkEntry(master=frame, placeholder_text="Username", width=800)

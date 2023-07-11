@@ -19,7 +19,7 @@ class UploadBot:
     def __init__(self, action, id_elem_to_modify, instance, username, password, level):
         # ============ Data from GUI
         self.action = action
-        self.idElement = id_elem_to_modify.upper()
+        self.idElements = id_elem_to_modify.split(",")
         self.instance = instance
         self.username = username
         self.password = password
@@ -47,17 +47,9 @@ class UploadBot:
         self.trophy_string = {}
         self.isTrophy = False
         self.isInternational = False
+        self.idElement = ''
 
     def start_bot(self):
-        if self.idElement.startswith("C"):
-            self.isTrophy = True
-            self.trophy_number_to_string()
-        if self.instance == "international.cyberguru.it":  # International id = 5
-            self.isInternational = True
-        if self.action == "Upload video":
-            self.get_video_strings()
-        else:
-            self.get_element_strings()
         self.driver = webdriver.Chrome(options=self.options)
         url = "https://" + self.instance
         self.driver.get(url)
@@ -75,12 +67,10 @@ class UploadBot:
         self.driver.find_element(By.ID, "loginbtn").click()
         element = WebDriverWait(driver=self.driver, timeout=20).until(
             ec.presence_of_element_located((By.CSS_SELECTOR, "#region-main-box")))
-        print(f"LOGIN as {self.username}, instance: {self.instance}, element: {self.idElement}, action: {self.action}")
+        print(f"LOGIN as {self.username}, instance: {self.instance}, element: {self.idElements}, action: {self.action}")
         self.logger.info(
-            f"LOGIN as {self.username}, instance: {self.instance}, element: {self.idElement}, action: {self.action}")
-        #self.goto_level_page()
-        self.driver.get("https://enterprise.cyberguru.it/mod/quiz/edit.php?cmid=32&cat=30%2C88&category=30%2C88&lastchanged=41")
-        self.get_quiz_to_edit_level_1()
+            f"LOGIN as {self.username}, instance: {self.instance}, element: {self.idElements}, action: {self.action}")
+        self.goto_level_page()
 
     def goto_level_page(self):
         try:
@@ -92,14 +82,27 @@ class UploadBot:
             print("Wrong username or passoword...closing browser")
             self.driver.quit()
         lvl_url = lvl_url.split("#", 1)[0]
-        self.driver.get(lvl_url)
-        # =========================================================================================== MODULE PAGE ======
-        element = WebDriverWait(driver=self.driver, timeout=20).until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, "#section-0")))
-        if self.isTrophy:
-            self.get_trophy_url_overview_page()
-        else:
-            self.get_quiz_url_overview_page()
+        for el_id in self.idElements:
+            self.idElement = el_id.upper()
+            print(f"start upload {self.idElement}")
+            self.logger.info(f"start upload {self.idElement}")
+            if self.idElement.startswith("C"):
+                self.isTrophy = True
+                self.trophy_number_to_string()
+            if self.instance == "international.cyberguru.it":  # International id = 5
+                self.isInternational = True
+            if self.action == "Upload video":
+                self.get_video_strings()
+            else:
+                self.get_element_strings()
+            self.driver.get(lvl_url)
+            # =========================================================================================== MODULE PAGE ======
+            element = WebDriverWait(driver=self.driver, timeout=20).until(
+                ec.presence_of_element_located((By.CSS_SELECTOR, "#section-0")))
+            if self.isTrophy:
+                self.get_trophy_url_overview_page()
+            else:
+                self.get_quiz_url_overview_page()
 
     def get_quiz_url_overview_page(self):
         selected_module_elements = self.driver.find_elements(By.XPATH, "//span[contains(text(), '" + str(
@@ -256,7 +259,7 @@ class UploadBot:
                     if (test[0][:4]+test[0][5:]) == quiz_id:
                         self.driver.find_element(By.ID, "id_name").clear()
                         self.driver.find_element(By.ID, "id_name").send_keys(test[0])
-                    self.custom_time_waster()
+                    self.custom_time_waster(2)
                     retry_attempts = 0
                     while retry_attempts < 3:
                         retry_attempts += 1
@@ -333,19 +336,19 @@ class UploadBot:
                 ec.presence_of_element_located((By.CSS_SELECTOR, "#id_generalheader")))
             question_textarea = re.sub('[^A-Za-z0-9\"\'<>=]+', '',
                                        self.driver.find_element(By.ID, "id_questiontexteditable").get_attribute(
-                                           'innerHTML').replace("&nbsp;", " "))
+                                           'innerHTML').replace("&nbsp;", " ").replace("&amp;", "&"))
             answer0_textarea = re.sub('[^A-Za-z0-9\"\'<>=]+', '',
                                       self.driver.find_element(By.ID, "id_answer_0editable").get_attribute(
                                           'innerHTML').replace(
-                                          "&nbsp;", " "))
+                                          "&nbsp;", " ").replace("&amp;", "&"))
             answer1_textarea = re.sub('[^A-Za-z0-9\"\'<>=]+', '',
                                       self.driver.find_element(By.ID, "id_answer_1editable").get_attribute(
                                           'innerHTML').replace(
-                                          "&nbsp;", " "))
+                                          "&nbsp;", " ").replace("&amp;", "&"))
             answer2_textarea = re.sub('[^A-Za-z0-9\"\'<>=]+', '',
                                       self.driver.find_element(By.ID, "id_answer_2editable").get_attribute(
                                           'innerHTML').replace(
-                                          "&nbsp;", " "))
+                                          "&nbsp;", " ").replace("&amp;", "&"))
             q = re.sub('[^A-Za-z0-9\"\'<>=]+', '', QandA[1])
             a1 = re.sub('[^A-Za-z0-9\"\'<>=]+', '', QandA[2])
             a2 = re.sub('[^A-Za-z0-9\"\'<>=]+', '', QandA[3])
@@ -402,13 +405,21 @@ class UploadBot:
     def get_element_strings(self):
         starting_column = -1
         # when making an exe remember to add ../ before xlsx file
-        if self.idElement.startswith('C'):
-            df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx", sheet_name="quiz coppe",
-                               header=None)
-            self.logger.info("Opening excel file trophy sheet")
-        else:
-            df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx", header=None)
-            self.logger.info("Opening excel file quiz sheet")
+        not_read = True
+        while not_read:
+            try:
+                if self.idElement.startswith('C'):
+                    df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx", sheet_name="quiz coppe",
+                                       header=None)
+                    self.logger.info("Opening excel file trophy sheet")
+                else:
+                    df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx", header=None)
+                    self.logger.info("Opening excel file quiz sheet")
+                not_read = False
+            except PermissionError:
+                answer = input("File Stringhequizlite.xlsx is open, please close - Continue (Y/n)")
+                if answer.upper() != "Y":
+                    sys.exit("Closing uploadbot. Bye!!")
         rows = list(df.values.tolist())
         for j, h in enumerate(rows[0]):
             if h == "ID":
@@ -451,14 +462,22 @@ class UploadBot:
 
     def get_video_strings(self):
         starting_column = -1
-        if self.isInternational:
-            df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx",
-                               sheet_name="video international",
-                               header=None)
-        else:
-            df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx",
-                               sheet_name="video awareness",
-                               header=None)
+        not_read = True
+        while not_read:
+            try:
+                if self.isInternational:
+                    df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx",
+                                       sheet_name="video international",
+                                       header=None)
+                else:
+                    df = pd.read_excel(f"{self.Path}{my_variables.excel_path}StringheQuizLite.xlsx",
+                                       sheet_name="video awareness",
+                                       header=None)
+                not_read = False
+            except PermissionError:
+                answer = input("File Stringhequizlite.xlsx is open, please close - Continue (Y/n)")
+                if answer.upper() != "Y":
+                    sys.exit("Closing uploadbot. Bye!!")
         rows = list(df.values.tolist())
         for j, h in enumerate(rows[0]):
             if h == "Codice HTML video":
